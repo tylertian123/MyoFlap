@@ -11,3 +11,9 @@
 
 # VM Crash Logs
 hs_err_pid*.log
+
+# Dynamic Libraries
+*.dll
+
+# Include libraries
+!/lib/*
