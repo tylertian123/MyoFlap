@@ -1,0 +1,19 @@
+plugins {
+    // Apply the java plugin to add support for Java
+    id 'java'
+
+    // Apply the application plugin to add support for building an application
+    id 'application'
+}
+
+// Define the main class for the application
+mainClassName = ''
+
+dependencies {
+
+}
+
+// In this section you declare where to find the dependencies of your project
+repositories {
+    
+}

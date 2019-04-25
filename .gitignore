@@ -1,0 +1,13 @@
+# Build output
+/bin/
+/build/
+
+# Gradle files
+.gradle
+
+# Visual studio code
+.settings
+.vscode
+
+# VM Crash Logs
+hs_err_pid*.log
