@@ -5,6 +5,7 @@ import com.thalmic.myo.DeviceListener;
 import com.thalmic.myo.Myo;
 import com.thalmic.myo.Pose;
 import com.thalmic.myo.Quaternion;
+import com.thalmic.myo.Vector3;
 import com.thalmic.myo.WarmupState;
 import com.thalmic.myo.XDirection;
 
@@ -18,6 +19,8 @@ public class DataCollector extends DeviceListener {
     Quaternion refOrientation = null;
     Quaternion orientationRaw = null;
     Quaternion orientation = null;
+
+    Vector3 lastAccelData = null;
 
     double yaw, pitch, roll;
 
@@ -116,4 +119,12 @@ public class DataCollector extends DeviceListener {
                 1.0f - 2.0f * (orientation.y() * orientation.y() + orientation.z() * orientation.z()));
     }
 
+    @Override
+    public void onAccelerometerData(Myo myo, long timestamp, Vector3 data) {
+        lastAccelData = data;
+    }
+
+    public Vector3 getAccelerometerData() {
+        return lastAccelData;
+    }
 }

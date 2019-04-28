@@ -3,6 +3,7 @@ package com.arctos6135.myoflap;
 import java.awt.AWTException;
 import java.awt.Robot;
 import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
 
 import com.arctos6135.myoflap.myo.DataCollector;
 import com.thalmic.myo.Hub;
@@ -56,7 +57,7 @@ public class Main {
             System.exit(1);
         }
 
-        while(collector.getOrientationQuat() == null) {
+        while(collector.getOrientationQuat() == null || collector.getAccelerometerData() == null) {
             hub.runOnce(1000);
         }
         collector.setRefOrientation(collector.getOrientationQuat());
@@ -73,7 +74,7 @@ public class Main {
             System.exit(3);
         }
 
-        double mid = -13;
+        double mid = 13;
         double highest = Double.NEGATIVE_INFINITY;
         double lowest = Double.POSITIVE_INFINITY;
 
@@ -81,7 +82,7 @@ public class Main {
             // Run the hub until one event occurs
             hub.runOnce(1000);
             // Only do stuff if the Myo is actually on the arm
-            if (collector.onArm()) {
+            if (true/*collector.onArm()*/) {
                 double pitch = collector.getOrientationEuler().getPitchDegrees();
                 
                 //System.out.println("Pitch: " + pitch);
@@ -92,11 +93,11 @@ public class Main {
                     lowest = pitch;
                 }
                 long time = System.currentTimeMillis();
-                if(pitch > mid + 1) {
+                if(pitch < mid - 1) {
                     if(time - timeFlapHigh <= 3000) {
                         System.out.println("\u001b[4m\u001b[1mFlap!\u001b[0m");
-                        robot.mousePress(InputEvent.BUTTON1_DOWN_MASK);
-                        robot.mouseRelease(InputEvent.BUTTON1_DOWN_MASK);
+                        robot.keyPress(KeyEvent.VK_SPACE);
+                        robot.keyRelease(KeyEvent.VK_SPACE);
                         //mid = (lowest + highest) / 2;
                         highest = Double.NEGATIVE_INFINITY;
                         lowest = Double.POSITIVE_INFINITY;
@@ -104,7 +105,7 @@ public class Main {
                     timeFlapHigh = 0;
                     timeFlapLow = time;
                 }
-                else if(pitch < mid - 1) {
+                else if(pitch > mid + 1) {
                     if(timeFlapHigh == 0 && time - timeFlapLow <= 3000) {
                         timeFlapHigh = time;
                     }
@@ -113,6 +114,8 @@ public class Main {
                 if(counter++ > 10) {
                     System.out.printf("Pitch: %.2f\tBounds: %.2f\t%.2f\nTimes: %d\t%d\n", pitch, mid + 1, mid - 1,
                             timeFlapLow, timeFlapHigh);
+                    
+                    //System.out.printf("X: %4f\tY:%4f\tZ:%4f\n", collector.getAccelerometerData().x(), collector.getAccelerometerData().y(), collector.getAccelerometerData().z());
                 }
             }
         }
