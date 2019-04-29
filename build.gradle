@@ -10,10 +10,18 @@ plugins {
 mainClassName = 'com.arctos6135.myoflap.Main'
 
 dependencies {
-    compile files('lib/MyoJavaAPI.jar')
+    implementation files('lib/MyoJavaAPI.jar')
 }
 
 // In this section you declare where to find the dependencies of your project
 repositories {
     
+}
+
+jar {
+    manifest {
+        attributes 'Main-Class': mainClassName
+    }
+
+    from { configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) } }
 }
