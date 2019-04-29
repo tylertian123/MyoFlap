@@ -57,7 +57,7 @@ public class Main {
             System.exit(1);
         }
 
-        while(collector.getOrientationQuat() == null || collector.getAccelerometerData() == null) {
+        while(collector.getAccelerometerData() == null) {
             hub.runOnce(1000);
         }
         collector.setRefOrientation(collector.getOrientationQuat());
@@ -74,49 +74,29 @@ public class Main {
             System.exit(3);
         }
 
-        double mid = 13;
-        double highest = Double.NEGATIVE_INFINITY;
-        double lowest = Double.POSITIVE_INFINITY;
-
         while (true) {
             // Run the hub until one event occurs
             hub.runOnce(1000);
-            // Only do stuff if the Myo is actually on the arm
-            if (true/*collector.onArm()*/) {
-                double pitch = collector.getOrientationEuler().getPitchDegrees();
-                
-                //System.out.println("Pitch: " + pitch);
-                if(pitch > highest) {
-                    highest = pitch;
+            double acceleration = collector.getAccelerometerData().z();
+            long time = System.currentTimeMillis();
+            // Factor in gravity
+            if(acceleration < -0.5) {
+                System.out.println("[" + System.currentTimeMillis() + "] High-to-Low Flap! (" + acceleration + ")");
+                if(time - timeFlapHigh <= 3000) {
+                    System.out.println("\u001b[4m\u001b[1mFlap!\u001b[0m");
+                    robot.keyPress(KeyEvent.VK_SPACE);
+                    robot.keyRelease(KeyEvent.VK_SPACE);
                 }
-                if(pitch < lowest) {
-                    lowest = pitch;
-                }
-                long time = System.currentTimeMillis();
-                if(pitch < mid - 1) {
-                    if(time - timeFlapHigh <= 3000) {
-                        System.out.println("\u001b[4m\u001b[1mFlap!\u001b[0m");
-                        robot.keyPress(KeyEvent.VK_SPACE);
-                        robot.keyRelease(KeyEvent.VK_SPACE);
-                        //mid = (lowest + highest) / 2;
-                        highest = Double.NEGATIVE_INFINITY;
-                        lowest = Double.POSITIVE_INFINITY;
-                    }
-                    timeFlapHigh = 0;
-                    timeFlapLow = time;
-                }
-                else if(pitch > mid + 1) {
-                    if(timeFlapHigh == 0 && time - timeFlapLow <= 3000) {
-                        timeFlapHigh = time;
-                    }
-                }
+                timeFlapHigh = 0;
+                timeFlapLow = time;
+            }
+            else if(acceleration > 2.0) {
+                System.out.println("[" + System.currentTimeMillis() + "] Low-to-High Flap! (" + acceleration + ")");
+                timeFlapHigh = time;
+            }
 
-                if(counter++ > 10) {
-                    System.out.printf("Pitch: %.2f\tBounds: %.2f\t%.2f\nTimes: %d\t%d\n", pitch, mid + 1, mid - 1,
-                            timeFlapLow, timeFlapHigh);
-                    
-                    //System.out.printf("X: %4f\tY:%4f\tZ:%4f\n", collector.getAccelerometerData().x(), collector.getAccelerometerData().y(), collector.getAccelerometerData().z());
-                }
+            if(counter++ > 10) {
+                //System.out.printf("X: %4f\tY:%4f\tZ:%4f\n", collector.getAccelerometerData().x(), collector.getAccelerometerData().y(), collector.getAccelerometerData().z());
             }
         }
     }
