@@ -2,7 +2,6 @@ package com.arctos6135.myoflap;
 
 import java.awt.AWTException;
 import java.awt.Robot;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 
 import com.arctos6135.myoflap.myo.DataCollector;
@@ -62,9 +61,7 @@ public class Main {
         }
         collector.setRefOrientation(collector.getOrientationQuat());
 
-        long timeFlapLow = 0;
         long timeFlapHigh = 0;
-        int counter = 0;
         
         try {
             robot = new Robot();
@@ -88,15 +85,10 @@ public class Main {
                     robot.keyRelease(KeyEvent.VK_SPACE);
                 }
                 timeFlapHigh = 0;
-                timeFlapLow = time;
             }
             else if(acceleration > 2.0) {
                 System.out.println("[" + System.currentTimeMillis() + "] Low-to-High Flap! (" + acceleration + ")");
                 timeFlapHigh = time;
-            }
-
-            if(counter++ > 10) {
-                //System.out.printf("X: %4f\tY:%4f\tZ:%4f\n", collector.getAccelerometerData().x(), collector.getAccelerometerData().y(), collector.getAccelerometerData().z());
             }
         }
     }
